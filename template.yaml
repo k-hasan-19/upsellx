@@ -73,3 +73,8 @@ Resources:
           Name: 'AWS::Include'
           Parameters:
             Location: upsellx-openapi.yaml
+Outputs:
+  ApiUrl:
+    Description: "API url"
+    Value: !Sub 'https://${UpsellXServerlessAPI}.execute-api.${AWS::Region}.amazonaws.com/dev'
+    
