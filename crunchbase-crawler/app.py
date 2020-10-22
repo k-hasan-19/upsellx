@@ -1,11 +1,14 @@
 import json
+import boto3
 import requests
 from bs4 import BeautifulSoup
+from datastore import DataStore
 
 
 def lambda_handler(event, context):
     # print(json.dumps(event))
-    query = event.get("query", "twitter")
+    query_domain = event.get("domain", "twitter.com")
+    query = query_domain.split(".")[0]
     url_session = "https://www.crunchbase.com"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
@@ -120,7 +123,8 @@ def lambda_handler(event, context):
             company_investor_count = int(
                 "".join(element.find("field-formatter").text.strip().split(","))
             )
-    return {
+
+    company_dict = {
         "company_about": company_about,
         "company_location": company_location,
         "company_size": company_size,
@@ -134,3 +138,19 @@ def lambda_handler(event, context):
         "company_team_member_count": company_team_member_count,
         "company_investor_count": company_investor_count,
     }
+    table = DataStore.get_table_client()
+    PK, SK = DataStore.profile_keys(domain=query_domain)
+    item = dict()
+    item["crunchbase.com"] = company_dict
+    item["updated_at"] = DataStore.date_time_now()
+    item["PK"] = PK
+    item["SK"] = SK
+    print(json.dumps(item))
+    data = table.get_item(Key={"PK": PK, "SK": SK})
+    if not data.get("Item"):
+        table.put_item(Item=item)
+    else:
+        item_ = data["Item"]
+        item_["crunchbase.com"] = company_dict
+        item_["updated_at"] = DataStore.date_time_now()
+        table.put_item(Item=item_)

@@ -3,7 +3,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 from encoder_class import DecimalEncoder
-from company import DataStore
+from datastore import DataStore
 
 
 def lambda_handler(event, context):
