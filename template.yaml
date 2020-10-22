@@ -44,3 +44,15 @@ Resources:
         - python3.8
         - nodejs12.x
       RetentionPolicy: Delete
+      
+  UpsellXServerlessAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: 'dev'
+      EndpointConfiguration: REGIONAL
+      OpenApiVersion: 3.0.3
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: upsellx-openapi.yaml
