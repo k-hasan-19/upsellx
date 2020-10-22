@@ -1,0 +1,44 @@
+openapi: 3.0.3
+info:
+  title: UpsellX Web Service
+  description: UpsellX Private and Public API Specification
+  version: 0.1.0
+
+x-amazon-apigateway-request-validators:
+  basic:
+    validateRequestBody: true
+    validateRequestParameters: true
+  params-only:
+    validateRequestBody: false
+    validateRequestParameters: true
+x-amazon-apigateway-minimum-compression-size: 1024
+tags:
+  - name: company-profile
+    description: Company profle info
+paths:
+  /companies/onboarding/profile:
+    get:
+      tags:
+        - company-profile
+      summary: Returns a list of mined company information
+      operationId: getCrawledCompanyInfo
+      parameters:
+        - in: query
+          name: domain
+          schema:
+              type: string
+              format: hostname
+          description: get profile info by domain
+      responses:
+        '200':
+          description: A JSON object of company info
+        '400':
+          description: bad input parameter
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CompanyProfileFunction.Arn}/invocations
+        httpMethod: POST
+        passthroughBehavior: WHEN_NO_TEMPLATES
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
+      x-amazon-apigateway-request-validator: params-only
