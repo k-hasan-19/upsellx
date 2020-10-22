@@ -28,6 +28,7 @@ paths:
           schema:
               type: string
               format: hostname
+          required: True
           description: get profile info by domain
       responses:
         '200':
@@ -36,7 +37,7 @@ paths:
           description: bad input parameter
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CompanyProfileFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CompanyProfileFunction.Arn}:live/invocations
         httpMethod: POST
         passthroughBehavior: WHEN_NO_TEMPLATES
         contentHandling: CONVERT_TO_TEXT
