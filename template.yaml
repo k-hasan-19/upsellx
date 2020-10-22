@@ -5,6 +5,9 @@ Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
     Timeout: 30
+    AutoPublishAlias: live
+    DeploymentPreference:
+      Type: AllAtOnce
 
 Resources:
 
