@@ -15,7 +15,7 @@ Resources:
       CodeUri: ./angel-crawler
       Handler: app.lambda_handler
       Runtime: nodejs12.x
-      MemorySize: 1600
+      MemorySize: 1024
       Layers:
         - Ref: LayerDependencies
       
