@@ -22,7 +22,7 @@ Resources:
   LayerDependencies:
     Type: 'AWS::Serverless::LayerVersion'
     Properties:
-      LayerName: python
+      LayerName: python-nodejs
       ContentUri: ./layers/dependencies/
       CompatibleRuntimes:
         - python3.8
