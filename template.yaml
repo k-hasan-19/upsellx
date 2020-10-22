@@ -14,8 +14,10 @@ Resources:
       FunctionName: angel-crawler
       CodeUri: ./angel-crawler
       Handler: app.lambda_handler
-      Runtime: python3.8
-      MemorySize: 256
+      Runtime: nodejs12.x
+      MemorySize: 1600
+      Layers:
+        - Ref: LayerDependencies
       
   LayerDependencies:
     Type: 'AWS::Serverless::LayerVersion'
@@ -24,4 +26,5 @@ Resources:
       ContentUri: ./layers/dependencies/
       CompatibleRuntimes:
         - python3.8
+        - nodejs12.x
       RetentionPolicy: Delete
