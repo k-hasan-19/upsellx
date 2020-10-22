@@ -7,6 +7,19 @@ Globals:
     Timeout: 30
 
 Resources:
+
+  CrunchbaseCrawlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: crunchbase.com web crawler
+      FunctionName: crunchbase-crawler
+      CodeUri: ./crunchbase-crawler
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      MemorySize: 256
+      Layers:
+        - Ref: LayerDependencies
+        
   AngelCrawlerFunction:
     Type: AWS::Serverless::Function
     Properties:
