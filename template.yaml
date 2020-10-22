@@ -10,7 +10,24 @@ Globals:
       Type: AllAtOnce
 
 Resources:
-
+  CompanyProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: company profile info miner
+      FunctionName: company-info
+      CodeUri: ./company-info
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      MemorySize: 256
+      Events:
+        SubscribeToPlan:
+          Type: Api
+          Properties:
+            Path: /companies/onboarding/profile
+            Method: GET
+            RestApiId:
+              Ref: UpsellXServerlessAPI
+              
   CrunchbaseCrawlerFunction:
     Type: AWS::Serverless::Function
     Properties:
