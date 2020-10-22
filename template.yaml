@@ -35,9 +35,13 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.8
       MemorySize: 256
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UpsellXStackTable
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
+          TABLE_NAME: !Ref UpsellXStackTable
       Events:
         SubscribeToPlan:
           Type: Api
@@ -76,6 +80,26 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
+  
+  UpsellXStackTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "PK"
+          AttributeType: "S"
+        -
+          AttributeName: "SK"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "PK"
+          KeyType: "HASH"
+        -
+          AttributeName: "SK"
+          KeyType: "RANGE"
+      TableName: upsellx-stack-table
+      BillingMode: PAY_PER_REQUEST
       
   LayerDependencies:
     Type: 'AWS::Serverless::LayerVersion'
