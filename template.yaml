@@ -65,6 +65,7 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
+          TABLE_NAME: !Ref UpsellXStackTable
         
   AngelCrawlerFunction:
     Type: AWS::Serverless::Function
@@ -80,6 +81,7 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
+          TABLE_NAME: !Ref UpsellXStackTable
   
   UpsellXStackTable:
     Type: AWS::DynamoDB::Table
