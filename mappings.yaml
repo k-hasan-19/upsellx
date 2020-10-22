@@ -1,0 +1,10 @@
+Environment:
+  Development:
+    AbbrLowerCase: dev
+    AbbrUpperCase: DEV
+  Staging:
+    AbbrLowerCase: stg
+    AbbrUpperCase: STG
+  Production:
+    AbbrLowerCase: prod
+    AbbrUpperCase: PROD

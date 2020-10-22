@@ -2,6 +2,22 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment parameter is used to tag associated resource in relevant environment
+    Default: Development
+    AllowedValues:
+      - Development
+      - Staging
+      - Production
+      
+Mappings:
+  'Fn::Transform':
+    Name: AWS::Include
+    Parameters:
+      Location: ./mappings.yaml
+      
 Globals:
   Function:
     Timeout: 30
@@ -19,6 +35,9 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.8
       MemorySize: 256
+      Environment:
+        Variables:
+          ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
       Events:
         SubscribeToPlan:
           Type: Api
@@ -39,6 +58,9 @@ Resources:
       MemorySize: 256
       Layers:
         - Ref: LayerDependencies
+      Environment:
+        Variables:
+          ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
         
   AngelCrawlerFunction:
     Type: AWS::Serverless::Function
@@ -51,6 +73,9 @@ Resources:
       MemorySize: 1024
       Layers:
         - Ref: LayerDependencies
+      Environment:
+        Variables:
+          ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
       
   LayerDependencies:
     Type: 'AWS::Serverless::LayerVersion'
@@ -65,7 +90,7 @@ Resources:
   UpsellXServerlessAPI:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: 'dev'
+      StageName: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
       EndpointConfiguration: REGIONAL
       OpenApiVersion: 3.0.3
       DefinitionBody:
@@ -76,5 +101,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: "API url"
-    Value: !Sub 'https://${UpsellXServerlessAPI}.execute-api.${AWS::Region}.amazonaws.com/dev'
-    
+    Value: !Join ['/', [!Sub 'https://${UpsellXServerlessAPI}.execute-api.${AWS::Region}.amazonaws.com', !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']]]
