@@ -6,7 +6,7 @@ exports.lambda_handler = async (event, context) => {
   let result = null;
   let browser = null;
   let query_domain = event.domain || 'twitter.com';
-  const query = query_domain.split('.')[0]
+  const query = query_domain.split('.')[0].trim()
   try {
     browser = await chromium.puppeteer.launch({
       args: chromium.args,
