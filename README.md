@@ -11,6 +11,8 @@
 
 ### Deployment
 ```bash
+cd layers/dependencies/nodejs/ && npm install && cd -
+pip install -r layers/dependencies/python/requirements.txt --target layers/dependencies/python/ --no-cache-dir
 sam deploy --guided
 ```
 ## Architecture
