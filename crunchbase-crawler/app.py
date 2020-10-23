@@ -12,7 +12,7 @@ SOURCE_DOMAIN = "crunchbase.com"
 def lambda_handler(event, context):
     # print(json.dumps(event))
     query_domain = event.get("domain", "twitter.com")
-    query = query_domain.split(".")[0]
+    query = query_domain.split(".")[0].strip()
     url_session = "https://www.crunchbase.com"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
@@ -57,7 +57,7 @@ def lambda_handler(event, context):
     )
     # pdb.set_trace()
 
-    assert len(about_elements) > 0, "UnMappable About elements!"
+    # assert len(about_elements) > 0, "UnMappable About elements!"
     (
         company_location,
         company_size,
@@ -97,7 +97,7 @@ def lambda_handler(event, context):
             company_rank = int("".join(element_content.split(",")))
 
     highlight_elements = soup.find_all("mat-card")[1].find_all("a")
-    assert len(highlight_elements) > 0, "UnMappable Highlight elements"
+    # assert len(highlight_elements) > 0, "UnMappable Highlight elements"
 
     (
         company_stock_symbol,
