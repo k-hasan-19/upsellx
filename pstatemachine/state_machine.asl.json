@@ -1,0 +1,34 @@
+{
+  "Comment": "Parallel crunchbase.com && angel.co web crawler execution",
+  "StartAt": "LookupCustomerInfo",
+  "States": {
+    "LookupCustomerInfo": {
+      "Type": "Parallel",
+      "End": true,
+      "Branches": [
+        {
+         "StartAt": "LookupAtCrunchbase",
+         "States": {
+           "LookupAtCrunchbase": {
+             "Type": "Task",
+             "Resource":
+               "${CrunchbaseCrawlerFunctionArn}",
+             "End": true
+           }
+         }
+       },
+       {
+         "StartAt": "LookupAtAngel",
+         "States": {
+           "LookupAtAngel": {
+             "Type": "Task",
+             "Resource":
+               "${AngelCrawlerFunctionArn}",
+             "End": true
+           }
+         }
+       }
+      ]
+    }
+  }
+}
