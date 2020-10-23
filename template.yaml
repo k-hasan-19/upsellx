@@ -24,6 +24,8 @@ Globals:
     AutoPublishAlias: live
     DeploymentPreference:
       Type: AllAtOnce
+    ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 5
 
 Resources:
   CompanyProfileFunction:
@@ -43,7 +45,7 @@ Resources:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
           TABLE_NAME: !Ref UpsellXStackTable
       Events:
-        SubscribeToPlan:
+        GetProfile:
           Type: Api
           Properties:
             Path: /companies/onboarding/profile
@@ -88,6 +90,47 @@ Resources:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
           TABLE_NAME: !Ref UpsellXStackTable
+          
+  ParallelStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: pstatemachine/state_machine.asl.json
+      Tracing:
+        Enabled: True
+      DefinitionSubstitutions:
+        CrunchbaseCrawlerFunctionArn: !GetAtt CrunchbaseCrawlerFunction.Arn
+        AngelCrawlerFunctionArn: !GetAtt AngelCrawlerFunction.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CrunchbaseCrawlerFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref AngelCrawlerFunction
+              
+  StartStateMachineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: state machine starter
+      FunctionName: state-machine-starter
+      CodeUri: ./state-machine-starter
+      Handler: app.lambda_handler
+      Runtime: nodejs12.x
+      MemorySize: 256
+      Policies:
+        - AWSStepFunctionsFullAccess
+        # - StepFunctionsExecutionPolicy:
+        #     StateMachineName: !GetAtt [ParallelStateMachine, Name]
+      Environment:
+        Variables:
+          ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
+          STATE_MACHINE_ARN: !Ref ParallelStateMachine
+      Events:
+        PostDomain:
+          Type: Api
+          Properties:
+            Path: /companies/onboarding/profile
+            Method: POST
+            RestApiId:
+              Ref: UpsellXServerlessAPI
   
   UpsellXStackTable:
     Type: AWS::DynamoDB::Table
