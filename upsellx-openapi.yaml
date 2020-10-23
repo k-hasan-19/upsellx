@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: UpsellX Web Service
   description: UpsellX Private and Public API Specification
-  version: 0.1.0
+  version: 0.2.0
 
 x-amazon-apigateway-request-validators:
   basic:
@@ -43,3 +43,33 @@ paths:
         contentHandling: CONVERT_TO_TEXT
         type: aws_proxy
       x-amazon-apigateway-request-validator: params-only
+  
+    post:
+      tags:
+        - company-profile
+      summary: Submits a crawling job
+      operationId: submitCrawlingJob
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  format: hostname
+                  minLength: 3
+              required:
+                - domain
+      responses:
+        200:
+          description: Crawling job submitted
+          
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${StartStateMachineFunction.Arn}:live/invocations
+        httpMethod: POST
+        passthroughBehavior: WHEN_NO_TEMPLATES
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
+      x-amazon-apigateway-request-validator: basic
