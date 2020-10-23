@@ -1,6 +1,7 @@
 const chromium = require('chrome-aws-lambda');
 const AWS = require('aws-sdk')
 
+const SOURCE_DOMAIN = 'angel.co'
 exports.lambda_handler = async (event, context) => {
   let result = null;
   let browser = null;
@@ -75,11 +76,12 @@ exports.lambda_handler = async (event, context) => {
     const docClient = new AWS.DynamoDB.DocumentClient()
     let [PK, SK] = ["Company" + "#" + query_domain, 'profile']
     const item = {
-      'angel.co': result,
+      // 'angel.co': result,
       'PK': PK,
       'SK': SK,
       'updated_at': new Date().toISOString()
     }
+    item[SOURCE_DOMAIN] = result
     const get_params = {
       TableName: process.env.TABLE_NAME,
       Key: {
@@ -94,12 +96,14 @@ exports.lambda_handler = async (event, context) => {
     const data = await getData(docClient, get_params)
     if (!data['Item']) {
       await insertData(docClient, put_params)
+      dump_to_s3(item, query_domain)
     } else {
       let item_ = data['Item']
-      item_['angel.co'] = result
+      item_[SOURCE_DOMAIN] = result
       item_["updated_at"] = new Date().toISOString()
       put_params['Item'] = item_
       await insertData(docClient, put_params)
+      dump_to_s3(item_, query_domain)
 
     }
 
@@ -151,4 +155,23 @@ function insertData(docClient, params) {
       }
     })
   })
+}
+
+function date_now() {
+  return new Date().toISOString().split('T')[0]
+}
+
+function dump_to_s3(json_data, domain) {
+  let date_string = date_now()
+  const S3 = new AWS.S3()
+  S3.putObject({
+    Bucket: process.env.BUCKET_NAME,
+    Key: SOURCE_DOMAIN + '/' + date_string + '/' + domain + '.json',
+    Body: JSON.stringify(json_data)
+  })
+    .promise()
+    .then(() => console.log('UPLOAD SUCCESS'))
+    .catch(e => {
+      console.error('ERROR', e);
+    });
 }

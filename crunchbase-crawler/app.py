@@ -1,8 +1,12 @@
+import os
 import json
 import boto3
 import requests
+from datetime import datetime
 from bs4 import BeautifulSoup
 from datastore import DataStore
+
+SOURCE_DOMAIN = "crunchbase.com"
 
 
 def lambda_handler(event, context):
@@ -141,16 +145,35 @@ def lambda_handler(event, context):
     table = DataStore.get_table_client()
     PK, SK = DataStore.profile_keys(domain=query_domain)
     item = dict()
-    item["crunchbase.com"] = company_dict
+    item[SOURCE_DOMAIN] = company_dict
     item["updated_at"] = DataStore.date_time_now()
     item["PK"] = PK
     item["SK"] = SK
-    print(json.dumps(item))
+    # print(json.dumps(item))
+
     data = table.get_item(Key={"PK": PK, "SK": SK})
     if not data.get("Item"):
         table.put_item(Item=item)
+        _dump_to_s3(item, query_domain)
     else:
         item_ = data["Item"]
-        item_["crunchbase.com"] = company_dict
+        item_[SOURCE_DOMAIN] = company_dict
         item_["updated_at"] = DataStore.date_time_now()
         table.put_item(Item=item_)
+        _dump_to_s3(item_, query_domain)
+
+
+def _dump_to_s3(json_data: dict, domain):
+    bucket_name = os.getenv("BUCKET_NAME")
+    date_str = _date_now()
+    s3 = boto3.resource("s3")
+    s3object = s3.Object(
+        bucket_name, SOURCE_DOMAIN + "/" + date_str + "/" + domain + ".json"
+    )
+
+    s3object.put(Body=(bytes(json.dumps(json_data).encode("UTF-8"))))
+
+
+def _date_now():
+    now = datetime.now()
+    return now.strftime("%Y-%m-%d")
