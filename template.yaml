@@ -28,6 +28,12 @@ Globals:
         ProvisionedConcurrentExecutions: 5
 
 Resources:
+
+###############################################################################
+# Data Mining && API
+# Resources <Start>
+###############################################################################
+
   CompanyProfileFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -67,10 +73,13 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UpsellXStackTable
+        - S3WritePolicy:
+            BucketName: !Ref TempBucket
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
           TABLE_NAME: !Ref UpsellXStackTable
+          BUCKET_NAME: !Ref TempBucket
         
   AngelCrawlerFunction:
     Type: AWS::Serverless::Function
@@ -86,10 +95,13 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UpsellXStackTable
+        - S3WritePolicy:
+            BucketName: !Ref TempBucket
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
           TABLE_NAME: !Ref UpsellXStackTable
+          BUCKET_NAME: !Ref TempBucket
           
   ParallelStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -173,7 +185,26 @@ Resources:
           Name: 'AWS::Include'
           Parameters:
             Location: upsellx-openapi.yaml
+            
+###############################################################################
+# Data Warehouse
+# Resources <Start>
+###############################################################################
+          
+            
+  TempBucket:
+      Type: AWS::S3::Bucket
+  SiloBucket:
+      Type: AWS::S3::Bucket
 Outputs:
   ApiUrl:
     Description: "API url"
     Value: !Join ['/', [!Sub 'https://${UpsellXServerlessAPI}.execute-api.${AWS::Region}.amazonaws.com', !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']]]
+    
+  TemporaryBucket:
+    Description: "Temporary S3 Bucket name"
+    Value: !Ref TempBucket
+    
+  SiloBucket:
+    Description: "Silo S3 storage Bucket name"
+    Value: !Ref SiloBucket
