@@ -24,8 +24,8 @@ Globals:
     AutoPublishAlias: live
     DeploymentPreference:
       Type: AllAtOnce
-    ProvisionedConcurrencyConfig:
-        ProvisionedConcurrentExecutions: 5
+    # ProvisionedConcurrencyConfig:
+    #     ProvisionedConcurrentExecutions: 5
 
 Resources:
 
@@ -44,12 +44,14 @@ Resources:
       Runtime: python3.8
       MemorySize: 256
       Policies:
+        - AWSStepFunctionsFullAccess
         - DynamoDBReadPolicy:
             TableName: !Ref UpsellXStackTable
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
           TABLE_NAME: !Ref UpsellXStackTable
+          STATE_MACHINE_ARN: !Ref ParallelStateMachine
       Events:
         GetProfile:
           Type: Api
@@ -196,6 +198,8 @@ Resources:
       Type: AWS::S3::Bucket
   SiloBucket:
       Type: AWS::S3::Bucket
+      
+  
 Outputs:
   ApiUrl:
     Description: "API url"
