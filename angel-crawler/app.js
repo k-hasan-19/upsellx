@@ -1,10 +1,11 @@
 const chromium = require('chrome-aws-lambda');
+const AWS = require('aws-sdk')
 
 exports.lambda_handler = async (event, context) => {
   let result = null;
   let browser = null;
-  let query = event.query || 'twitter';
-
+  let query_domain = event.domain || 'twitter.com';
+  const query = query_domain.split('.')[0]
   try {
     browser = await chromium.puppeteer.launch({
       args: chromium.args,
@@ -71,9 +72,45 @@ exports.lambda_handler = async (event, context) => {
       }
     })
 
-    return result
-    // console.log(company_about);
-    // console.log(company_page_url)
+    const docClient = new AWS.DynamoDB.DocumentClient()
+    let [PK, SK] = ["Company" + "#" + query_domain, 'profile']
+    const item = {
+      'angel.co': result,
+      'PK': PK,
+      'SK': SK,
+      'updated_at': new Date().toISOString()
+    }
+    const get_params = {
+      TableName: process.env.TABLE_NAME,
+      Key: {
+        "PK": PK,
+        "SK": SK
+      }
+    }
+    const put_params = {
+      TableName: process.env.TABLE_NAME,
+      Item: item
+    }
+    const data = await getData(docClient, get_params)
+    if (!data['Item']) {
+      await insertData(docClient, put_params)
+    } else {
+      let item_ = data['Item']
+      item_['angel.co'] = result
+      item_["updated_at"] = new Date().toISOString()
+      put_params['Item'] = item_
+      await insertData(docClient, put_params)
+
+    }
+
+
+    // if not data.get("Item"):
+    //     table.put_item(Item=item)
+    // else:
+    //     item_ = data["Item"]
+    //     item_["crunchbase.com"] = company_dict
+    //     item_["updated_at"] = DataStore.date_time_now()
+    //     table.put_item(Item=item_)
 
   } catch (error) {
     console.log(error)
@@ -85,3 +122,33 @@ exports.lambda_handler = async (event, context) => {
 
   return result;
 };
+
+
+function getData(docClient, params) {
+  console.log(params)
+  return new Promise((resolve, reject) => {
+    docClient.get(params, (err, data) => {
+      if (err) {
+        console.log("Unable to read items. Error: ", err)
+        reject(err)
+      } else {
+        console.log("Successfully retrieved items. Error: ", JSON.stringify(data, null, 2))
+        resolve(data)
+      }
+    })
+  })
+}
+
+function insertData(docClient, params) {
+  return new Promise((resolve, reject) => {
+    docClient.put(params, (err, data) => {
+      if (err) {
+        console.log("Unable to write items. Error: ", err)
+        reject(err)
+      } else {
+        console.log("Successfully added items. Error: ", JSON.stringify(data, null, 2))
+        resolve(data)
+      }
+    })
+  })
+}

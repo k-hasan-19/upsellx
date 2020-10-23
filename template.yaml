@@ -36,7 +36,7 @@ Resources:
       Runtime: python3.8
       MemorySize: 256
       Policies:
-        - DynamoDBCrudPolicy:
+        - DynamoDBReadPolicy:
             TableName: !Ref UpsellXStackTable
       Environment:
         Variables:
@@ -62,6 +62,9 @@ Resources:
       MemorySize: 256
       Layers:
         - Ref: LayerDependencies
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UpsellXStackTable
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
@@ -78,6 +81,9 @@ Resources:
       MemorySize: 1024
       Layers:
         - Ref: LayerDependencies
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UpsellXStackTable
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
