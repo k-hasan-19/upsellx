@@ -7,6 +7,7 @@
 - [x] Parallelization
 - [x] NoSQL Database
 - [ ] ETL
+- [ ] Pipeline Scheduler
 
 ### Deployment
 ```bash
