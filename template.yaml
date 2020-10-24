@@ -212,17 +212,6 @@ Resources:
       CatalogId: !Ref AWS::AccountId
       DatabaseInput:
         Name: upsellxsilo
-        
-  # GlueTempCrunchTable:
-  #   Type: AWS::Glue::Table
-  #   DependsOn: GlueTempDatabase
-  #   Properties:
-  #     CatalogId: !Ref AWS::AccountId
-  #     DatabaseName: !Ref GlueTempDatabase
-  #     TableInput:
-  #       Name: crunchbase
-  #       StorageDescriptor:
-  #         Location: !Sub "s3://${TempBucket}/crunchbase.com/"
       
  
   GlueCrunchbaseTempCrawler:
@@ -234,6 +223,7 @@ Resources:
       Targets:
         S3Targets:
           - Path: !Sub "s3://${TempBucket}/crunchbase.com/"
+      Configuration: "{\"Version\":1.0,\"Grouping\":{\"TableGroupingPolicy\":\"CombineCompatibleSchemas\"}}"
       SchemaChangePolicy:
         UpdateBehavior: "UPDATE_IN_DATABASE"
         DeleteBehavior: "LOG"
@@ -249,6 +239,7 @@ Resources:
       Targets:
         S3Targets:
           - Path: !Sub "s3://${TempBucket}/angel.co/"
+      Configuration: "{\"Version\":1.0,\"Grouping\":{\"TableGroupingPolicy\":\"CombineCompatibleSchemas\"}}"
       SchemaChangePolicy:
         UpdateBehavior: "UPDATE_IN_DATABASE"
         DeleteBehavior: "LOG"
@@ -264,6 +255,7 @@ Resources:
       Targets:
         S3Targets:
           - Path: !Sub "s3://${SiloBucket}/crunchbase.com/"
+      Configuration: "{\"Version\":1.0,\"Grouping\":{\"TableGroupingPolicy\":\"CombineCompatibleSchemas\"}}"
       SchemaChangePolicy:
         UpdateBehavior: "UPDATE_IN_DATABASE"
         DeleteBehavior: "LOG"
@@ -279,6 +271,7 @@ Resources:
       Targets:
         S3Targets:
           - Path: !Sub "s3://${SiloBucket}/angel.co/"
+      Configuration: "{\"Version\":1.0,\"Grouping\":{\"TableGroupingPolicy\":\"CombineCompatibleSchemas\"}}"
       SchemaChangePolicy:
         UpdateBehavior: "UPDATE_IN_DATABASE"
         DeleteBehavior: "LOG"
