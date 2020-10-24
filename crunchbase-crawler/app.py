@@ -154,13 +154,13 @@ def lambda_handler(event, context):
     data = table.get_item(Key={"PK": PK, "SK": SK})
     if not data.get("Item"):
         table.put_item(Item=item)
-        _dump_to_s3(item, query_domain)
+        _dump_to_s3(item[SOURCE_DOMAIN], query_domain)
     else:
         item_ = data["Item"]
         item_[SOURCE_DOMAIN] = company_dict
         item_["updated_at"] = DataStore.date_time_now()
         table.put_item(Item=item_)
-        _dump_to_s3(item_, query_domain)
+        _dump_to_s3(item_[SOURCE_DOMAIN], query_domain)
 
 
 def _dump_to_s3(json_data: dict, domain):

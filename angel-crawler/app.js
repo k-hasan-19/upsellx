@@ -96,14 +96,14 @@ exports.lambda_handler = async (event, context) => {
     const data = await getData(docClient, get_params)
     if (!data['Item']) {
       await insertData(docClient, put_params)
-      dump_to_s3(item, query_domain)
+      dump_to_s3(item[SOURCE_DOMAIN], query_domain)
     } else {
       let item_ = data['Item']
       item_[SOURCE_DOMAIN] = result
       item_["updated_at"] = new Date().toISOString()
       put_params['Item'] = item_
       await insertData(docClient, put_params)
-      dump_to_s3(item_, query_domain)
+      dump_to_s3(item_[SOURCE_DOMAIN], query_domain)
 
     }
 
