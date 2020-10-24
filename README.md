@@ -6,7 +6,7 @@
 - [x] Web Crawlers(2)
 - [x] Parallelization
 - [x] NoSQL Database
-- [ ] ETL
+- [x] ETL
 - [ ] Pipeline Scheduler
 
 ### Deployment
