@@ -199,7 +199,117 @@ Resources:
   SiloBucket:
       Type: AWS::S3::Bucket
       
-  
+  GlueTempDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: upsellxtemp
+        
+  GlueSiloDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: upsellxsilo
+        
+  # GlueTempCrunchTable:
+  #   Type: AWS::Glue::Table
+  #   DependsOn: GlueTempDatabase
+  #   Properties:
+  #     CatalogId: !Ref AWS::AccountId
+  #     DatabaseName: !Ref GlueTempDatabase
+  #     TableInput:
+  #       Name: crunchbase
+  #       StorageDescriptor:
+  #         Location: !Sub "s3://${TempBucket}/crunchbase.com/"
+      
+ 
+  GlueCrunchbaseTempCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: "crunchbase-json"
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueTempDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://${TempBucket}/crunchbase.com/"
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Schedule:
+        ScheduleExpression: "cron(22 08 * * ? *)"
+        
+  GlueAngelTempCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: "angel-json"
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueTempDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://${TempBucket}/angel.co/"
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Schedule:
+        ScheduleExpression: "cron(22 08 * * ? *)"
+        
+  GlueCrunchbaseSiloCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: "crunchbase-parquet"
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueSiloDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://${SiloBucket}/crunchbase.com/"
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Schedule:
+        ScheduleExpression: "cron(22 08 * * ? *)"
+        
+  GlueAngelSiloCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: "angel-parquet"
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueSiloDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://${SiloBucket}/angel.co/"
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Schedule:
+        ScheduleExpression: "cron(22 08 * * ? *)"
+        
+        
+  GlueServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "glue.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "*"
+                Resource: "*"
 Outputs:
   ApiUrl:
     Description: "API url"
