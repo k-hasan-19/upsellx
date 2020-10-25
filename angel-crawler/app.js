@@ -43,9 +43,9 @@ exports.lambda_handler = async (event, context) => {
 
       let [company_links, company_location, company_size, company_funding_total, company_market_tags, ] = [
         [],
-        "n/a",
-        "n/a",
-        "n/a",
+        "",
+        "",
+        "",
         [],
       ]
       for (const [index, element] of aside_elements_dd_arr.entries()) {
