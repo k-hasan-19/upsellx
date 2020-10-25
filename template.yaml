@@ -71,7 +71,7 @@ Resources:
       Runtime: python3.8
       MemorySize: 256
       Layers:
-        - Ref: LayerDependencies
+        - Ref: LayerDepPython
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UpsellXStackTable
@@ -93,7 +93,7 @@ Resources:
       Runtime: nodejs12.x
       MemorySize: 1024
       Layers:
-        - Ref: LayerDependencies
+        - Ref: LayerDepNodejs
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UpsellXStackTable
@@ -166,13 +166,21 @@ Resources:
       TableName: upsellx-stack-table
       BillingMode: PAY_PER_REQUEST
       
-  LayerDependencies:
+  LayerDepPython:
     Type: 'AWS::Serverless::LayerVersion'
     Properties:
-      LayerName: python-nodejs
-      ContentUri: ./layers/dependencies/
+      LayerName: python
+      ContentUri: ./layers/py/
       CompatibleRuntimes:
         - python3.8
+      RetentionPolicy: Delete
+      
+  LayerDepNodejs:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      LayerName: nodejs
+      ContentUri: ./layers/node/
+      CompatibleRuntimes:
         - nodejs12.x
       RetentionPolicy: Delete
       
