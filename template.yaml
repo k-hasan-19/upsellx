@@ -24,8 +24,8 @@ Globals:
     AutoPublishAlias: live
     DeploymentPreference:
       Type: AllAtOnce
-    # ProvisionedConcurrencyConfig:
-    #     ProvisionedConcurrentExecutions: 5
+    ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 5
 
 Resources:
 
