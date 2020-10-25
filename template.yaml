@@ -288,7 +288,7 @@ Resources:
       CodeUri: ./aws-data-wrangler
       Handler: app.lambda_handler
       Runtime: python3.8
-      MemorySize: 2048
+      MemorySize: 3008
       Layers:
         - Ref: LayerDepPython
       Policies:
@@ -300,13 +300,18 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
+          TEMP_BUCKET: !Ref TempBucket
+          SILO_BUCKET: !Ref SiloBucket
+          DOMAINS: crunchbase.com,angel.co
+          SOURCE_DATABASE: upsellxtemp
+          DEST_DATABASE: upsellxsilo
       Events:
-        Crunchbase:
+        Transform:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 hour)'
-            Name: TestSchedule
-            Description: test schedule
+            Schedule: 'rate(1 day)'
+            Name: dataCompression
+            Description: Crawled data compression for Silo 
             Enabled: False
       
               
