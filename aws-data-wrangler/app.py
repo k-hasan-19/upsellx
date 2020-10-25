@@ -27,6 +27,10 @@ def lambda_handler(event, context):
             dataset=True,
             database=dest_db,  # Athena/Glue database
             table=domain.strip(),  # Athena/Glue table
+            dtype={
+                "company_team_member_count": "string",
+                "company_investor_count": "string",
+            },
         )
 
 
