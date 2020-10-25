@@ -279,6 +279,37 @@ Resources:
                 Effect: "Allow"
                 Action: "*"
                 Resource: "*"
+                
+  AWSwranglerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: AWS data wrangler
+      FunctionName: aws-data-wrangler
+      CodeUri: ./aws-data-wrangler
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      MemorySize: 2048
+      Layers:
+        - Ref: LayerDepPython
+      Policies:
+        - AWSGlueServiceRole
+        - S3WritePolicy:
+            BucketName: !Ref SiloBucket
+        - S3ReadPolicy:
+            BucketName: !Ref TempBucket
+      Environment:
+        Variables:
+          ENVIRONMENT: !FindInMap [Environment, !Ref Environment, 'AbbrLowerCase']
+      Events:
+        Crunchbase:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 hour)'
+            Name: TestSchedule
+            Description: test schedule
+            Enabled: False
+      
+              
 Outputs:
   ApiUrl:
     Description: "API url"
