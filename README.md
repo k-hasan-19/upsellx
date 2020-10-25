@@ -9,10 +9,9 @@
 - [x] ETL
 - [x] Pipeline Scheduler
 
-### Deployment
+### Deployment(sam-cli)
 ```bash
 cd layers/node/nodejs/ && npm install && cd -
-
 pip install -r layers/py/python/requirements.txt --target layers/py/python/ --no-cache-dir
 sam deploy --guided
 ```

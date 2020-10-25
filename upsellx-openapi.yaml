@@ -48,6 +48,7 @@ paths:
       tags:
         - company-profile
       summary: Submits a crawling job
+      description: Web crawling job in parallel to mine submitted company domain info
       operationId: submitCrawlingJob
       requestBody:
         content:
