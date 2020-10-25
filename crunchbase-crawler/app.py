@@ -66,12 +66,12 @@ def lambda_handler(event, context):
         company_website,
         company_rank,
     ) = (
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
+        "n/a",
+        "n/a",
+        "n/a",
+        "n/a",
+        "n/a",
+        "n/a",
     )
 
     for about_element in about_elements:
@@ -94,7 +94,7 @@ def lambda_handler(event, context):
         if element_target == "_blank":
             company_website = element_content.split("/")[0].strip()
         if "rank_org_company" in element_href:
-            company_rank = int("".join(element_content.split(",")))
+            company_rank = element_content
 
     highlight_elements = soup.find_all("mat-card")[1].find_all("a")
     # assert len(highlight_elements) > 0, "UnMappable Highlight elements"
@@ -106,11 +106,11 @@ def lambda_handler(event, context):
         company_team_member_count,
         company_investor_count,
     ) = (
-        "",
-        "",
-        "",
-        "",
-        "",
+        "n/a",
+        "n/a",
+        "n/a",
+        "n/a",
+        "n/a",
     )
     for element in highlight_elements:
         if "Stock" in element.find("label-with-info").text:
@@ -118,15 +118,12 @@ def lambda_handler(event, context):
         if "Total Funding" in element.find("label-with-info").text:
             company_funding_total = element.find("field-formatter").text.strip()
         if "Acquisitions" in element.find("label-with-info").text:
-            company_accusitions = int(element.find("field-formatter").text.strip())
+            company_accusitions = element.find("field-formatter").text.strip()
         if "Current Team" in element.find("label-with-info").text:
-            company_team_member_count = int(
-                "".join(element.find("field-formatter").text.strip().split(","))
-            )
+            company_team_member_count = element.find("field-formatter").text.strip()
+
         if "Investors" in element.find("label-with-info").text:
-            company_investor_count = int(
-                "".join(element.find("field-formatter").text.strip().split(","))
-            )
+            company_investor_count = element.find("field-formatter").text.strip()
 
     company_dict = {
         "company_about": company_about,
