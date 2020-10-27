@@ -23,4 +23,4 @@ sam deploy --guided
 * Scheduler will compress data everyday in parquet && will append to `upsellxsilo` database. To access it early run `aws-data-wrangler` lambda function from aws console.
 ## Architecture
 
-![App Architecture](https://raw.githubusercontent.com/k-hasan-19/upsellx/master/images/UpSellx.png)
+![App Architecture](images/UpSellx.png)
