@@ -10,7 +10,7 @@
 - [x] Pipeline Scheduler
 
 ### Deployment(sam-cli)
-Run following commands from the top level directory of the repo to build layer and deploy the app.
+Run following commands from the **top level directory** of the repo to build layer and to deploy the app.
 ```bash
 docker run --rm -v $PWD:/usr/app node:12 bash -c "cd /usr/app/layers/node/nodejs/ && npm install"
 docker run --rm -v $PWD:/usr/app python:3.8 bash -c "pip install -r /usr/app/layers/py/python/requirements.txt --target /usr/app/layers/py/python/ --no-cache-dir"
