@@ -24,8 +24,6 @@ Globals:
     AutoPublishAlias: live
     DeploymentPreference:
       Type: AllAtOnce
-    ProvisionedConcurrencyConfig:
-        ProvisionedConcurrentExecutions: 5
 
 Resources:
 
@@ -43,6 +41,8 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.8
       MemorySize: 256
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Policies:
         - AWSStepFunctionsFullAccess
         - DynamoDBReadPolicy:
@@ -70,6 +70,8 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.8
       MemorySize: 256
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Layers:
         - Ref: LayerDepPython
       Policies:
@@ -92,6 +94,8 @@ Resources:
       Handler: app.lambda_handler
       Runtime: nodejs12.x
       MemorySize: 1024
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Layers:
         - Ref: LayerDepNodejs
       Policies:
